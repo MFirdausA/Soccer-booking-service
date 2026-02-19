@@ -13,26 +13,24 @@ watch: ## Run the service with hot reload
 
 ## Build:
 build: ## Build the service
-	go build -o order-service
+	go build -o user-service
 
 ## Docker:
 docker-compose: ## Start the service in docker
 	docker-compose up -d --build --force-recreate
 
 docker-build: ## Build the Docker image with a specified tag
-	@echo "$(CYAN)Building Docker image...$(RESET)"
-	@if [ -z "$(tag)" ]; then \
-		echo "$(YELLOW)Error: Please specify the 'tag' parameter, e.g., make docker-build tag=1.0.0$(RESET)"; \
-		exit 1; \
-	fi
-	docker build --platform linux/amd64 -t sikoding20/payment-service:$(tag) .
-	@echo "$(GREEN)Docker image built with tag '$(tag)'$(RESET)"
+	@echo Building Docker image...
+ifndef tag
+	$(error Please specify the tag parameter, e.g., make docker-build tag=1.0.0)
+endif
+	docker build --platform linux/amd64 -t frdausa/user-service:$(tag) .
+	@echo Docker image built with tag $(tag)
 
-docker-push: ## Build the Docker image with a specified tag
-	@echo "$(CYAN)Building Docker image...$(RESET)"
-	@if [ -z "$(tag)" ]; then \
-		echo "$(YELLOW)Error: Please specify the 'tag' parameter, e.g., make docker-push tag=1.0.0$(RESET)"; \
-		exit 1; \
-	fi
-	docker push sikoding20/payment-service:$(tag)
-	@echo "$(GREEN)Docker image built with tag '$(tag)'$(RESET)"
+docker-push: ## Push the Docker image with a specified tag
+	@echo Pushing Docker image...
+ifndef tag
+	$(error Please specify the tag parameter, e.g., make docker-push tag=1.0.0)
+endif
+	docker push frdausa/user-service:$(tag)
+	@echo Docker image pushed with tag $(tag)
