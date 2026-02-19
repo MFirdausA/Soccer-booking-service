@@ -14,6 +14,7 @@ import (
 	"user-service/repositories"
 	"user-service/routes"
 	"user-service/services"
+
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth/limiter"
 	"github.com/gin-gonic/gin"
@@ -60,8 +61,8 @@ var command = &cobra.Command{
 			})
 		})
 		router.GET("/", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusNotFound, response.Response{
-				Status:  constants.Error,
+			ctx.JSON(http.StatusOK, response.Response{
+				Status:  constants.Success,
 				Message: "Welcome to User Service",
 			})
 		})
