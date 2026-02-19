@@ -1,10 +1,11 @@
 package response
 
 import (
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"user-service/constants"
 	errConstant "user-service/constants/error"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Response struct {

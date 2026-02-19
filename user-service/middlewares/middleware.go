@@ -1,4 +1,4 @@
-package middleware
+package middlewares
 
 import (
 	"context"
@@ -27,7 +27,7 @@ func HandlePanic() gin.HandlerFunc {
 				logrus.Errorf("Recovered from panic: %v", r)
 				c.JSON(http.StatusInternalServerError, response.Response{
 					Status:  constants.Error,
-					Message: errConstant.ErrInternalServerError.Error,
+					Message: errConstant.ErrInternalServerError.Error(),
 				})
 				c.Abort()
 			}
@@ -51,9 +51,9 @@ func RateLimiter(lmt *limiter.Limiter) gin.HandlerFunc {
 }
 
 func extractBearerToken(token string) string {
-	arrrayToken := strings.Split(token, "")
-	if len(arrrayToken) == 2 {
-		return arrrayToken[1]
+	arrayToken := strings.Split(token, " ")
+	if len(arrayToken) == 2 {
+		return arrayToken[1]
 	}
 	return ""
 }
@@ -66,7 +66,7 @@ func responseUnauthorized(c *gin.Context, message string) {
 	c.Abort()
 }
 
-func vallidateApiKey(c *gin.Context) error {
+func validateAPIKey(c *gin.Context) error {
 	apiKey := c.GetHeader(constants.XApiKey)
 	requestAt := c.GetHeader(constants.XRequestAt)
 	serviceName := c.GetHeader(constants.XserviceName)
@@ -84,10 +84,9 @@ func vallidateApiKey(c *gin.Context) error {
 }
 
 func validateBearerToken(c *gin.Context, token string) error {
-	if !strings.Contains(strings.ToLower(token), "bearer") {
+	if !strings.Contains(token, "Bearer") {
 		return errConstant.ErrUnauthorized
 	}
-	
 
 	tokenString := extractBearerToken(token)
 	if tokenString == "" {
@@ -95,11 +94,12 @@ func validateBearerToken(c *gin.Context, token string) error {
 	}
 
 	claims := &services.Claims{}
-	tokenJwt, err := jwt.ParseWithClaims(tokenString, claims , func(token * jwt.Token) (interface{}, error) {
+	tokenJwt, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
 			return nil, errConstant.ErrInvalidToken
 		}
+
 		jwtSecret := []byte(config.Config.JwtSecretKey)
 		return jwtSecret, nil
 	})
@@ -115,7 +115,7 @@ func validateBearerToken(c *gin.Context, token string) error {
 }
 
 func Authenticate() gin.HandlerFunc {
-	return  func(c *gin.Context) {
+	return func(c *gin.Context) {
 		var err error
 		token := c.GetHeader(constants.Authorization)
 		if token == "" {
@@ -128,12 +128,13 @@ func Authenticate() gin.HandlerFunc {
 			responseUnauthorized(c, err.Error())
 			return
 		}
-		
-		err = vallidateApiKey(c)
+
+		err = validateAPIKey(c)
 		if err != nil {
 			responseUnauthorized(c, err.Error())
 			return
 		}
+
 		c.Next()
 	}
 }

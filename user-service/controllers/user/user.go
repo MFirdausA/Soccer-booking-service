@@ -1,13 +1,15 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
+	"fmt"
 	"net/http"
 	errWrap "user-service/common/error"
 	"user-service/common/response"
 	"user-service/domain/dto"
 	"user-service/services"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type UserController struct {
@@ -122,6 +124,7 @@ func (u *UserController) Update(ctx *gin.Context) {
 	uuid := ctx.Param("uuid")
 
 	err := ctx.ShouldBindJSON(request)
+	fmt.Println(err)
 	if err != nil {
 		response.HttpResponse(response.ParamHTTPResp{
 			Code: http.StatusBadRequest,
@@ -130,6 +133,8 @@ func (u *UserController) Update(ctx *gin.Context) {
 		})
 		return
 	}
+	fmt.Println(err)
+	
 
 	validate := validator.New()
 	err = validate.Struct(request)
